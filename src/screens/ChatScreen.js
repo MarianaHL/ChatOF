@@ -1,16 +1,36 @@
-import React from 'react';
-import {View, Text} from 'react-native';
-import FormButton from '../components/FormButton';
+import React, {useState} from 'react';
+import {GiftedChat} from 'react-native-gifted-chat';
 
-export default function ChatScreen({navigation}) {
+export default function ChatScreen() {
+  const [messages, setMessages] = useState([
+    {
+      _id: 0,
+      text: 'thread created',
+      createdAt: new Date().getTime(),
+      system: true,
+    },
+    {
+      _id: 1,
+      text: 'hello!',
+      createdAt: new Date().getTime(),
+      user: {
+        _id: 2,
+        name: 'Demo',
+      },
+    },
+  ]);
+
+  function handleSend(newMessage = []) {
+    setMessages(GiftedChat.append(messages, newMessage));
+  }
+
   return (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <Text>Create a new chat room</Text>
-      <FormButton
-        mode="contained"
-        title="Close Modal"
-        onPress={() => navigation.goBack()}
-      />
-    </View>
+    <GiftedChat
+      messages={messages}
+      onSend={(newMessage) => handleSend(newMessage)}
+      user={{
+        _id: 1,
+      }}
+    />
   );
 }
