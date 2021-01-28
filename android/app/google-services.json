@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1041975985573",
+    "firebase_url": "https://tester-of2020-default-rtdb.firebaseio.com",
+    "project_id": "tester-of2020",
+    "storage_bucket": "tester-of2020.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1041975985573:android:4f335ef90a0a9b60cbd44c",
+        "android_client_info": {
+          "package_name": "com.chatof"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1041975985573-c27e2l9fg77saroltfp2nd76dda93m12.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chatof",
+            "certificate_hash": "11b8703c7b5ab390119fcdf906f945366e60662a"
+          }
+        },
+        {
+          "client_id": "1041975985573-jvv0nq1k1pcuvkt1br44vr7oa9hn8cne.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4oeAvFu_Gc0WvkVwKVDfvl0fvh3fJ-bA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1041975985573-jvv0nq1k1pcuvkt1br44vr7oa9hn8cne.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
