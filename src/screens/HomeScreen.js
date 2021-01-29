@@ -2,6 +2,7 @@ import React, {useContext, useEffect} from 'react';
 import {View, StyleSheet, TouchableOpacity, FlatList, Text} from 'react-native';
 import {Avatar} from 'react-native-elements';
 import {AuthContext} from '../navigation/AuthProvider';
+import database from '@react-native-firebase/database';
 import {Separator} from '../components/Separator';
 
 export default function HomeScreen({navigation}) {
@@ -10,7 +11,21 @@ export default function HomeScreen({navigation}) {
   const currentUser = user.toJSON();
 
   useEffect(() => {
-    console.log({user});
+    console.log({user: user.uid});
+    const usuario = {
+      uid: user.uid,
+      nombre: user.displayName,
+      email: user.email,
+      foto: user.photoURL,
+      nuevosmensajes: 0,
+    };
+    database()
+      .ref('usuarios/' + user.uid)
+      .set(usuario)
+      .then((res) => {
+        console.log('usuario guardado');
+      })
+      .catch((e) => console.log(e));
   }, []);
 
   const valores = [
