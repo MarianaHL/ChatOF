@@ -1,27 +1,27 @@
-import React, {useState} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import {GiftedChat} from 'react-native-gifted-chat';
+import database from '@react-native-firebase/database';
+import {AuthContext} from '../navigation/AuthProvider';
 
 export default function ChatScreen() {
-  const [messages, setMessages] = useState([
-    {
-      _id: 0,
-      text: 'thread created',
-      createdAt: new Date().getTime(),
-      system: true,
-    },
-    {
-      _id: 1,
-      text: 'hello!',
-      createdAt: new Date().getTime(),
-      user: {
-        _id: 2,
-        name: 'Demo',
-      },
-    },
-  ]);
+  const {user} = useContext(AuthContext);
+  const currentUser = user.toJSON();
+  const [messages, setMessages] = useState([]);
 
-  function handleSend(newMessage = []) {
-    setMessages(GiftedChat.append(messages, newMessage));
+  function handleSend(messages = []) {
+    const text = messages[0].text;
+
+    database()
+      .ref('chat/')
+      .push({
+        text,
+        uid: user.uid,
+        fecha: Date.now(),
+      })
+      .then((res) => {
+        console.log('mensaje guardado');
+      })
+      .catch((e) => console.log(e));
   }
 
   return (

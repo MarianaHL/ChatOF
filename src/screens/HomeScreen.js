@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect} from 'react';
 import {View, StyleSheet, TouchableOpacity, FlatList, Text} from 'react-native';
 import {Avatar} from 'react-native-elements';
 import {AuthContext} from '../navigation/AuthProvider';
@@ -7,6 +7,11 @@ import {Separator} from '../components/Separator';
 export default function HomeScreen({navigation}) {
   const {user, logout} = useContext(AuthContext);
   const keyExtractor = (item, index) => index.toString();
+  const currentUser = user.toJSON();
+
+  useEffect(() => {
+    console.log({user});
+  }, []);
 
   const valores = [
     {
