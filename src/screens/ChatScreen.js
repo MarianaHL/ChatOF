@@ -22,8 +22,9 @@ export default function ChatScreen() {
     database()
       .ref('chat/')
       .push({
+        _id: Math.round(Math.random() * 1000000),
         text,
-        fecha: Date.now(),
+        createdAt: new Date().getTime(),
         user: {
           _id: currentUser.uid,
           email: currentUser.email,
@@ -38,6 +39,7 @@ export default function ChatScreen() {
   useEffect(() => {
     const messagesListener = database()
       .ref('chat/')
+      .orderByChild('createdAt')
       .on('child_added', (snapshot) => {
         console.log('User data: ', snapshot.val());
 
@@ -50,10 +52,12 @@ export default function ChatScreen() {
 
   function renderBubble(props) {
     return (
+      // Step 3: return the component
       <Bubble
         {...props}
         wrapperStyle={{
           right: {
+            // Here is the color change
             backgroundColor: '#6646ee',
           },
         }}
@@ -65,7 +69,6 @@ export default function ChatScreen() {
       />
     );
   }
-
   function renderLoading() {
     return (
       <View style={styles.loadingContainer}>
@@ -106,6 +109,7 @@ export default function ChatScreen() {
     <GiftedChat
       messages={messages}
       onSend={handleSend}
+      user={{_id: currentUser.uid}}
       placeholder="Type your message here..."
       alwaysShowSend
       showUserAvatar
