@@ -21,9 +21,13 @@ export default function ChatScreen() {
     database()
       .ref('chat/')
       .push({
+        uid: Math.round(Math.random() * 1000000),
         text,
-        uid: user.uid,
         fecha: Date.now(),
+        user: {
+          _id: currentUser.uid,
+          email: currentUser.email
+        }
       })
       .then((res) => {
         console.log('mensaje guardado');
@@ -100,7 +104,14 @@ export default function ChatScreen() {
 
   return (
     <GiftedChat
-      messages={messages}
+      messages={/*[{
+        _id: 1,
+        text: 'Hello developer',
+        createdAt: new Date(),
+        user: {
+          _id: 2
+        }
+      }]*/messages}
       onSend={handleSend}
       placeholder="Type your message here..."
       alwaysShowSend
