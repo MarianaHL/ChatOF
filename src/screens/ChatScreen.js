@@ -16,14 +16,18 @@ export default function ChatScreen() {
 
   const [messages, setMessages] = useState([]);
 
-  function handleSend(messages = []) {
+  function handleSend(messages) {
     const text = messages[0].text;
+
     database()
       .ref('chat/')
       .push({
         text,
-        uid: user.uid,
         fecha: Date.now(),
+        user: {
+          _id: currentUser.uid,
+          email: currentUser.email,
+        },
       })
       .then((res) => {
         console.log('mensaje guardado');

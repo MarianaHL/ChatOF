@@ -11,6 +11,7 @@ export default function HomeScreen({navigation}) {
   const currentUser = user.toJSON();
 
   useEffect(() => {
+    console.log({user: user.uid});
     const usuario = {
       uid: user.uid,
       nombre: user.displayName,
