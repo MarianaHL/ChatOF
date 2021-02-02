@@ -7,6 +7,7 @@ const {width, height} = Dimensions.get('screen');
 export default function FormInput({labelName, ...rest}) {
   return (
     <TextInput
+      mode={'outlined'}
       label={labelName}
       style={styles.input}
       numberOfLines={1}

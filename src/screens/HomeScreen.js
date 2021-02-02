@@ -1,6 +1,6 @@
 import React, {useContext, useEffect} from 'react';
 import {View, StyleSheet, TouchableOpacity, FlatList, Text} from 'react-native';
-import {Avatar} from 'react-native-elements';
+import {Avatar} from 'react-native-paper';
 import {AuthContext} from '../navigation/AuthProvider';
 import database from '@react-native-firebase/database';
 import {Separator} from '../components/Separator';
@@ -11,7 +11,6 @@ export default function HomeScreen({navigation}) {
   const currentUser = user.toJSON();
 
   useEffect(() => {
-    console.log({user: user.uid});
     const usuario = {
       uid: user.uid,
       nombre: user.displayName,
@@ -55,7 +54,7 @@ export default function HomeScreen({navigation}) {
           <TouchableOpacity
             onPress={() => navigation.navigate('Chat', {keyExtractor: item})}>
             <View style={styles.avatar}>
-              <Avatar rounded source={{uri: item.avatar}} />
+              <Avatar.Image size={40} source={{uri: item.avatar}} />
               <View style={{flexDirection: 'column'}}>
                 <Text style={styles.nombre}>{item.nombre}</Text>
                 <Text style={styles.puesto}>{item.puesto}</Text>

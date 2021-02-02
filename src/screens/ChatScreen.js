@@ -1,81 +1,23 @@
 import React, {useState, useContext, useEffect} from 'react';
-import {GiftedChat} from 'react-native-gifted-chat';
+import {
+  GiftedChat,
+  Bubble,
+  Send,
+  SystemMessage,
+} from 'react-native-gifted-chat';
 import database from '@react-native-firebase/database';
 import {AuthContext} from '../navigation/AuthProvider';
-import { TextComponent } from 'react-native';
+import {IconButton} from 'react-native-paper';
+import {StyleSheet, View, ActivityIndicator} from 'react-native';
 
-//componente que estan exportando.
 export default function ChatScreen() {
-  //hook useContext
   const {user} = useContext(AuthContext);
   const currentUser = user.toJSON();
 
-  //es un hook useState();
-  //[ miVariable, función para actualizar mi variable ] useState(elValorInicialDeMiVariable);
   const [messages, setMessages] = useState([]);
 
-  // []); => se ejecute una sola vez cuando se abre el componente.
-  // [user]); => se ejecuta cada vez que el usuario cambia.
-  // [user, messages]); => se ejecuta cada vez que el usuario cambia y cada vez que los mensajes cambian.
-
-  //Hook
-  useEffect(() => {
-    //uno auno de los mensajes
-    database()
-      .ref('chat/')
-      .orderBy('fecha')
-      .on('child_added', (snapshot) => {
-        console.log('User data: ', snapshot.val());
-
-        //setMessages(snapshot.val());
-
-        //no se deben perder los mensajes
-        //Inicio = []
-        //1er = [msj1];
-        //2do = [msj1, msj2];
-        //setMessages([...messages, snapshot.val()]);
-
-        //CallBack
-        //prevenir que una actualización se cumplió.
-
-        /*snapshot.val() = {
-          fecha: timestamp
-          texto: "texto",
-          uid: 2345
-        }
-        */
-
-        /*1er. [] => [{
-          fecha: timestamp
-          texto: "texto",
-          uid: 2345
-        }]
-        */
-
-        /*2do. 
-          [{
-            fecha: timestamp
-            texto: "texto",
-            uid: 2345
-          }] => 
-          [..., {
-          fecha: timestamp2
-          texto: "texto2",
-          uid: 2345-2
-        }]
-        */
-        setMessages((prevState) => [...prevState, snapshot.val()]);
-        //estoy actualizando 1, espera
-          //ahora actualiza 2
-        //estoy actualizando 2, espera
-          //ahora actualiza 3
-        //ya actualice 3
-          //ahora actualiza 4
-        //ya actualice 1
-      });
-  }, []);
-
   function handleSend(messages = []) {
+    const text = messages[0].text;
     database()
       .ref('chat/')
       .push({
@@ -89,13 +31,112 @@ export default function ChatScreen() {
       .catch((e) => console.log(e));
   }
 
+  useEffect(() => {
+    const messagesListener = database()
+      .ref('chat/')
+      .on('child_added', (snapshot) => {
+        console.log('User data: ', snapshot.val());
+
+        const messages = (prevState) => [...prevState, snapshot.val()];
+
+        setMessages(messages);
+      });
+    return () => messagesListener();
+  }, []);
+
+  function renderBubble(props) {
+    return (
+      <Bubble
+        {...props}
+        wrapperStyle={{
+          right: {
+            backgroundColor: '#6646ee',
+          },
+        }}
+        textStyle={{
+          right: {
+            color: '#fff',
+          },
+        }}
+      />
+    );
+  }
+
+  function renderLoading() {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#6646ee" />
+      </View>
+    );
+  }
+
+  function renderSend(props) {
+    return (
+      <Send {...props}>
+        <View style={styles.sendingContainer}>
+          <IconButton icon="send-circle" size={32} color="#6646ee" />
+        </View>
+      </Send>
+    );
+  }
+
+  function scrollToBottomComponent() {
+    return (
+      <View style={styles.bottomComponentContainer}>
+        <IconButton icon="chevron-double-down" size={36} color="#6646ee" />
+      </View>
+    );
+  }
+
+  function renderSystemMessage(props) {
+    return (
+      <SystemMessage
+        {...props}
+        wrapperStyle={styles.systemMessageWrapper}
+        textStyle={styles.systemMessageText}
+      />
+    );
+  }
+
   return (
     <GiftedChat
       messages={messages}
-      onSend={(newMessage) => handleSend(newMessage)}
-      user={{
-        _id: 1,
-      }}
+      onSend={handleSend}
+      placeholder="Type your message here..."
+      alwaysShowSend
+      showUserAvatar
+      scrollToBottom
+      renderBubble={renderBubble}
+      renderLoading={renderLoading}
+      renderSend={renderSend}
+      scrollToBottomComponent={scrollToBottomComponent}
+      renderSystemMessage={renderSystemMessage}
     />
   );
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sendingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  bottomComponentContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  systemMessageWrapper: {
+    backgroundColor: '#6646ee',
+    borderRadius: 4,
+    padding: 5,
+  },
+  systemMessageText: {
+    fontSize: 14,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+});
