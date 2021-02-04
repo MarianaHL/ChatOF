@@ -41,10 +41,9 @@ export default function ChatScreen() {
       .ref('chat/')
       .orderByChild('createdAt')
       .on('child_added', (snapshot) => {
-        console.log('User data: ', snapshot.val());
+        //console.log('User data: ', snapshot.val());
 
         const messages = (prevState) => [...prevState, snapshot.val()];
-
         setMessages(messages);
       });
     return () => messagesListener();
@@ -108,6 +107,7 @@ export default function ChatScreen() {
   return (
     <GiftedChat
       messages={messages}
+      inverted={false}
       onSend={handleSend}
       user={{_id: currentUser.uid}}
       placeholder="Type your message here..."
