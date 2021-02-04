@@ -19,6 +19,15 @@ export default function ChatScreen() {
   function handleSend(messages) {
     const text = messages[0].text;
 
+    /*
+    //1 Comprobar si existe el canal en caso contrario crearlo
+    if(){
+
+    }else{
+      uidUnido = setOnetoOne();
+    }
+    //2 Escribir en el canal de ambos users
+    */
     database()
       .ref('chat/')
       .push({
@@ -40,10 +49,9 @@ export default function ChatScreen() {
     const messagesListener = database()
       .ref('chat/')
       .on('child_added', (snapshot) => {
-        console.log('User data: ', snapshot.val());
+        //console.log('User data: ', snapshot.val());
 
         const messages = (prevState) => [...prevState, snapshot.val()];
-
         setMessages(messages);
       });
     return () => messagesListener();
@@ -107,6 +115,7 @@ export default function ChatScreen() {
   return (
     <GiftedChat
       messages={messages}
+      inverted={false}
       onSend={handleSend}
       inverted={false}
       user={{_id: currentUser.uid}}

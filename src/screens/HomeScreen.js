@@ -29,23 +29,19 @@ export default function HomeScreen({navigation}) {
   }, []);
 
   const valores = [
-    {
-      nombre: 'Mariana',
-      puesto: 'Developer',
-      avatar: 'https://avatars0.githubusercontent.com/u/17571969?v=3&s=400',
-    },
-    {
-      nombre: 'Martin',
-      puesto: 'Developer',
-      avatar: 'https://avatars0.githubusercontent.com/u/17571969?v=3&s=400',
-    },
-    {
-      nombre: 'Roberto',
-      puesto: 'Developer',
-      avatar: 'https://avatars0.githubusercontent.com/u/17571969?v=3&s=400',
-    },
+    {}
   ];
-
+  database().ref('usuarios')
+        .once('value', query =>{
+        
+        query.forEach(element => {
+          const val = element.val();
+          if(!(currentUser.uid === val.uid)){
+            valores.push(element.val())
+            console.log(valores);
+          }
+        });
+    })
   return (
     <View>
       <FlatList
@@ -55,10 +51,10 @@ export default function HomeScreen({navigation}) {
           <TouchableOpacity
             onPress={() => navigation.navigate('Chat', {keyExtractor: item})}>
             <View style={styles.avatar}>
-              <Avatar.Image size={40} source={{uri: item.avatar}} />
+              <Avatar.Image size={40} source={{uri: item.foto}} />
               <View style={{flexDirection: 'column'}}>
-                <Text style={styles.nombre}>{item.nombre}</Text>
-                <Text style={styles.puesto}>{item.puesto}</Text>
+                <Text style={styles.nombre}>{item.email}</Text>
+                <Text style={styles.puesto}>{item.uid}</Text>
               </View>
             </View>
             <Separator />
