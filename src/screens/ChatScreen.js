@@ -19,6 +19,15 @@ export default function ChatScreen() {
   function handleSend(messages) {
     const text = messages[0].text;
 
+    /*
+    //1 Comprobar si existe el canal en caso contrario crearlo
+    if(){
+
+    }else{
+      uidUnido = setOnetoOne();
+    }
+    //2 Escribir en el canal de ambos users
+    */
     database()
       .ref('chat/')
       .push({
