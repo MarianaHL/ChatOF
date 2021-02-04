@@ -6,13 +6,20 @@ import FormInput from '../components/FormInput';
 import FormButton from '../components/FormButton';
 
 export default function SignupScreen({navigation}) {
-  const {register} = useContext(AuthContext);
+  const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const {register, loading} = useContext(AuthContext);
+
+  if (loading) {
+    return <Loading />;
+  }
+
   return (
     <View style={styles.container}>
-      <Title style={styles.titleText}>Register to chat</Title>
+      <Title style={styles.titleText}>Let's get started!</Title>
+
       <FormInput
         labelName="Email"
         value={email}
@@ -29,14 +36,14 @@ export default function SignupScreen({navigation}) {
         title="Signup"
         modeValue="contained"
         labelStyle={styles.loginButtonLabel}
-        onPress={() => register(email, password)}
+        onPress={() => register(displayName, email, password)}
       />
       <IconButton
         icon="keyboard-backspace"
         size={30}
         style={styles.navButton}
-        color="#6646ee"
-        onPress={() => navigation.navigate('Login')}
+        color="#5b3a70"
+        onPress={() => navigation.goBack()}
       />
     </View>
   );

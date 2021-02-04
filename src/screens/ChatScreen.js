@@ -39,7 +39,6 @@ export default function ChatScreen() {
   useEffect(() => {
     const messagesListener = database()
       .ref('chat/')
-      .orderByChild('createdAt')
       .on('child_added', (snapshot) => {
         console.log('User data: ', snapshot.val());
 
@@ -109,6 +108,7 @@ export default function ChatScreen() {
     <GiftedChat
       messages={messages}
       onSend={handleSend}
+      inverted={false}
       user={{_id: currentUser.uid}}
       placeholder="Type your message here..."
       alwaysShowSend

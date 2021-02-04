@@ -1,12 +1,13 @@
 import React, {useState, useContext} from 'react';
 import {AuthContext} from '../navigation/AuthProvider';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, Button} from 'react-native';
 import {Title} from 'react-native-paper';
 import FormInput from '../components/FormInput';
 import FormButton from '../components/FormButton';
 
 export default function Login({navigation}) {
   const {login} = useContext(AuthContext);
+  const {google} = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -38,6 +39,7 @@ export default function Login({navigation}) {
         labelStyle={styles.navButtonText}
         onPress={() => navigation.navigate('Signup')}
       />
+      <Button title="Google Sign-In" onPress={() => google()} />
     </View>
   );
 }

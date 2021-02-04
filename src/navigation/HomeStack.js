@@ -42,9 +42,9 @@ function ChatApp() {
       <ChatAppStack.Screen
         name="Chat"
         component={ChatScreen}
-        /* options={({route}) => ({
-          title: route.params.thread.name,
-        })} */
+        options={({route}) => ({
+          title: route.params.name,
+        })}
       />
     </ChatAppStack.Navigator>
   );
