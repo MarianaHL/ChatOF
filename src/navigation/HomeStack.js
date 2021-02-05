@@ -43,7 +43,7 @@ function ChatApp() {
         name="Chat"
         component={ChatScreen}
         options={({route}) => ({
-          title: route.params.name,
+          title: route.params.thread.email,
         })}
       />
     </ChatAppStack.Navigator>

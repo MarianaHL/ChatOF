@@ -28,20 +28,18 @@ export default function HomeScreen({navigation}) {
       .catch((e) => console.log(e));
   }, []);
 
-  const valores = [
-    {}
-  ];
-  database().ref('usuarios')
-        .once('value', query =>{
-        
-        query.forEach(element => {
-          const val = element.val();
-          if(!(currentUser.uid === val.uid)){
-            valores.push(element.val())
-            console.log(valores);
-          }
-        });
-    })
+  const valores = [{}];
+  database()
+    .ref('usuarios')
+    .once('value', (query) => {
+      query.forEach((element) => {
+        const val = element.val();
+        if (!(currentUser.uid === val.uid)) {
+          valores.push(element.val());
+          console.log(valores);
+        }
+      });
+    });
   return (
     <View>
       <FlatList
@@ -49,7 +47,7 @@ export default function HomeScreen({navigation}) {
         keyExtractor={keyExtractor}
         renderItem={({item}) => (
           <TouchableOpacity
-            onPress={() => navigation.navigate('Chat', {keyExtractor: item})}>
+            onPress={() => navigation.navigate('Chat', {thread: item})}>
             <View style={styles.avatar}>
               <Avatar.Image size={40} source={{uri: item.foto}} />
               <View style={{flexDirection: 'column'}}>

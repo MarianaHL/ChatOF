@@ -7,6 +7,7 @@ import {GoogleSignin} from '@react-native-community/google-signin';
 GoogleSignin.configure({
   webClientId:
     '1041975985573-c27e2l9fg77saroltfp2nd76dda93m12.apps.googleusercontent.com',
+  offlineAccess: true,
 });
 
 export const AuthContext = createContext({});
