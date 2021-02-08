@@ -50,14 +50,16 @@ export default function ChatScreen({route, navigation}) {
       .orderByKey()
       .on('child_added', (snapshot) => {
         //console.log('User data: ', snapshot.val());
-        console.log(snapshot.key);
-        console.log(channel);
 
-        if (snapshot.key === channel) {
+        console.log(channel);
+        /*
+        if(snapshot.key === channel){
           const messages = (prevState) => [...prevState, snapshot.val()];
           setMessages(messages);
-          console.log('true');
-        }
+          console.log("true");
+        }*/
+        const messages = (prevState) => [...prevState, snapshot.val()];
+        setMessages(messages);
       });
     return () => messagesListener();
   }, []);
@@ -81,6 +83,7 @@ export default function ChatScreen({route, navigation}) {
       />
     );
   }
+
   function renderLoading() {
     //1 Comprobar si existe el canal en caso contrario crearlo
     if (currentUser.uid < keyExtractor.uid) {
@@ -134,7 +137,6 @@ export default function ChatScreen({route, navigation}) {
       messages={messages}
       inverted={false}
       onSend={handleSend}
-      inverted={false}
       user={{_id: currentUser.uid}}
       placeholder="Type your message here..."
       alwaysShowSend

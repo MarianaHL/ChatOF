@@ -34,11 +34,24 @@ export const AuthProvider = ({children}) => {
         register: async (displayName, email, password) => {
           setLoading(true);
           try {
-            await auth()
+            let {user} = auth()
               .createUserWithEmailAndPassword(email, password)
               .then((credential) => {
                 credential.user.updateProfile({displayName: displayName});
               });
+            //setUser(user)
+            console.log(user);
+            const usuario = {
+              uid: user.uid,
+              nombre: user.displayName,
+              email: user.email,
+              foto: user.photoURL,
+              nuevosmensajes: 0,
+            };
+            await database()
+              .ref('usuarios/' + user.uid)
+              .set(usuario);
+            console.log('Usuario guardado');
           } catch (e) {
             console.log(e);
           }

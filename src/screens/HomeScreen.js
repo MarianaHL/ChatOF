@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {View, StyleSheet, TouchableOpacity, FlatList, Text} from 'react-native';
 import {Avatar} from 'react-native-paper';
 import {AuthContext} from '../navigation/AuthProvider';
@@ -10,36 +10,29 @@ export default function HomeScreen({navigation}) {
   const keyExtractor = (item, index) => index.toString();
   const currentUser = user.toJSON();
 
+  const [valores, setValores] = useState([]);
+
   useEffect(() => {
-    console.log({currentUser});
-    const usuario = {
-      uid: user.uid,
-      nombre: user.displayName,
-      email: user.email,
-      foto: user.photoURL,
-      nuevosmensajes: 0,
-    };
-    database()
-      .ref('usuarios/' + user.uid)
-      .set(usuario)
-      .then((res) => {
-        console.log('usuario guardado');
-      })
-      .catch((e) => console.log(e));
+    console.log({user: user.email});
+
+    usuariosConectados();
   }, []);
 
-  const valores = [{}];
-  database()
-    .ref('usuarios')
-    .once('value', (query) => {
-      query.forEach((element) => {
+  async function usuariosConectados() {
+    try {
+      let usersOnline = await database().ref('usuarios').once('value');
+      usersOnline.forEach((element) => {
         const val = element.val();
         if (!(currentUser.uid === val.uid)) {
-          valores.push(element.val());
-          console.log(valores);
+          const valores = (prevState) => [...prevState, element.val()];
+          setValores(valores);
         }
       });
-    });
+      console.log(valores);
+    } catch (error) {
+      console.log(error);
+    }
+  }
   return (
     <View>
       <FlatList
