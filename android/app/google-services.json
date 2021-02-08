@@ -15,7 +15,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "1041975985573-c27e2l9fg77saroltfp2nd76dda93m12.apps.googleusercontent.com",
+          "client_id": "1041975985573-1jggsb6hrc5396vqmgub9ifs56q615vh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chatof",
+            "certificate_hash": "d8d63885984b3e3c1237fac5374e99c130ae6913"
+          }
+        },
+        {
+          "client_id": "1041975985573-fpjc48p43hc83cl8mvl9a5al68gdopp8.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.chatof",

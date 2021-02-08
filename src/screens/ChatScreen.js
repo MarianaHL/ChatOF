@@ -10,33 +10,31 @@ import {AuthContext} from '../navigation/AuthProvider';
 import {IconButton} from 'react-native-paper';
 import {StyleSheet, View, ActivityIndicator} from 'react-native';
 
-export default function ChatScreen() {
+export default function ChatScreen({route, navigation}) {
+  const {keyExtractor} = route.params;
+  console.warn(keyExtractor.uid);
   const {user} = useContext(AuthContext);
   const currentUser = user.toJSON();
 
   const [messages, setMessages] = useState([]);
+  const [channel, setChannel] = useState();
 
   function handleSend(messages) {
     const text = messages[0].text;
 
-    /*
-    //1 Comprobar si existe el canal en caso contrario crearlo
-    if(){
-
-    }else{
-      uidUnido = setOnetoOne();
-    }
-    //2 Escribir en el canal de ambos users
-    */
     database()
-      .ref('chat/')
+      .ref('chat/' + channel)
       .push({
         _id: Math.round(Math.random() * 1000000),
         text,
         createdAt: new Date().getTime(),
-        user: {
+        userSend: {
           _id: currentUser.uid,
           email: currentUser.email,
+        },
+        userReceived: {
+          _id: keyExtractor.uid,
+          email: keyExtractor.email,
         },
       })
       .then((res) => {
@@ -46,13 +44,20 @@ export default function ChatScreen() {
   }
 
   useEffect(() => {
+    //2 Obtener en el canal de ambos users
     const messagesListener = database()
       .ref('chat/')
+      .orderByKey()
       .on('child_added', (snapshot) => {
         //console.log('User data: ', snapshot.val());
+        console.log(snapshot.key);
+        console.log(channel);
 
-        const messages = (prevState) => [...prevState, snapshot.val()];
-        setMessages(messages);
+        if (snapshot.key === channel) {
+          const messages = (prevState) => [...prevState, snapshot.val()];
+          setMessages(messages);
+          console.log('true');
+        }
       });
     return () => messagesListener();
   }, []);
@@ -77,6 +82,18 @@ export default function ChatScreen() {
     );
   }
   function renderLoading() {
+    //1 Comprobar si existe el canal en caso contrario crearlo
+    if (currentUser.uid < keyExtractor.uid) {
+      setChannel(currentUser.uid + keyExtractor.uid);
+      console.log(channel + ' CHAAANEEEEEEEEEEEEL');
+      console.log(currentUser.uid);
+      console.log(keyExtractor.uid);
+    } else {
+      setChannel(keyExtractor.uid + currentUser.uid);
+      console.log(channel + ' CHAAANEEEEEEEEEEEEL');
+      console.log(currentUser.uid);
+      console.log(keyExtractor.uid);
+    }
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#6646ee" />

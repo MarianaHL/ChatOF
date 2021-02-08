@@ -19,7 +19,12 @@ export default function SignupScreen({navigation}) {
   return (
     <View style={styles.container}>
       <Title style={styles.titleText}>Let's get started!</Title>
-
+      <FormInput
+        labelName="Display Name"
+        value={displayName}
+        autoCapitalize="none"
+        onChangeText={(userDisplayName) => setDisplayName(userDisplayName)}
+      />
       <FormInput
         labelName="Email"
         value={email}

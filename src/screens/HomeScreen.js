@@ -47,7 +47,7 @@ export default function HomeScreen({navigation}) {
         keyExtractor={keyExtractor}
         renderItem={({item}) => (
           <TouchableOpacity
-            onPress={() => navigation.navigate('Chat', {thread: item})}>
+            onPress={() => navigation.navigate('Chat', {keyExtractor: item})}>
             <View style={styles.avatar}>
               <Avatar.Image size={40} source={{uri: item.foto}} />
               <View style={{flexDirection: 'column'}}>
