@@ -4,6 +4,8 @@ import database from '@react-native-firebase/database';
 
 export const AuthContext = createContext({});
 
+
+
 export const AuthProvider = ({children}) => {
   const [user, setUser] = useState(null);
 
@@ -21,7 +23,19 @@ export const AuthProvider = ({children}) => {
         },
         register: async (email, password) => {
           try {
-            await auth().createUserWithEmailAndPassword(email, password);
+            let {user} = await auth().createUserWithEmailAndPassword(email, password);
+            //setUser(user)
+            console.log(user)
+            const usuario = {
+              uid: user.uid,
+              nombre: user.displayName,
+              email: user.email,
+              foto: user.photoURL,
+              nuevosmensajes: 0,
+            };
+            await database().ref('usuarios/' + user.uid).set(usuario);
+            console.log("Usuario guardado")
+            
           } catch (e) {
             console.log(e);
           }

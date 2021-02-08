@@ -51,14 +51,16 @@ export default function ChatScreen({ route, navigation }) {
       .orderByKey()
       .on('child_added', (snapshot) => {
         //console.log('User data: ', snapshot.val());
-        console.log(snapshot.key)
-        console.log(channel)
         
+        console.log(channel)
+        /*
         if(snapshot.key === channel){
           const messages = (prevState) => [...prevState, snapshot.val()];
           setMessages(messages);
           console.log("true");
-        }
+        }*/
+        const messages = (prevState) => [...prevState, snapshot.val()];
+        setMessages(messages);
         
       });
     return () => messagesListener();
