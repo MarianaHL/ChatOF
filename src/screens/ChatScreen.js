@@ -21,9 +21,8 @@ export default function ChatScreen({route, navigation}) {
 
   function handleSend(messages) {
     const text = messages[0].text;
-
     database()
-      .ref('chat/' + channel)
+      .ref(`chat/${channel}`)
       .push({
         _id: Math.round(Math.random() * 1000000),
         text,
@@ -46,23 +45,24 @@ export default function ChatScreen({route, navigation}) {
   useEffect(() => {
     //2 Obtener en el canal de ambos users
     const messagesListener = database()
-      .ref('chat/')
+      .ref(`chat/${channel}`)
       .orderByKey()
       .on('child_added', (snapshot) => {
         //console.log('User data: ', snapshot.val());
 
-        console.log(channel);
+        console.log(snapshot.val());
         /*
         if(snapshot.key === channel){
           const messages = (prevState) => [...prevState, snapshot.val()];
           setMessages(messages);
           console.log("true");
         }*/
+
         const messages = (prevState) => [...prevState, snapshot.val()];
         setMessages(messages);
       });
     return () => messagesListener();
-  }, []);
+  }, [channel]);
 
   function renderBubble(props) {
     return (
