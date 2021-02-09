@@ -4,21 +4,9 @@ import {View, StyleSheet, Button} from 'react-native';
 import {Title} from 'react-native-paper';
 import FormInput from '../components/FormInput';
 import FormButton from '../components/FormButton';
-import {
-  GoogleSignin,
-  GoogleSigninButton,
-  statusCodes,
-} from '@react-native-community/google-signin';
-
-GoogleSignin.configure({
-  webClientId:
-    '1041975985573-c27e2l9fg77saroltfp2nd76dda93m12.apps.googleusercontent.com',
-  offlineAccess: true,
-});
 
 export default function Login({navigation}) {
   const {login} = useContext(AuthContext);
-  const {google} = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -42,14 +30,6 @@ export default function Login({navigation}) {
         modeValue="contained"
         labelStyle={styles.loginButtonLabel}
         onPress={() => login(email, password)}
-      />
-      <FormButton
-        title="Google Sign-In"
-        modeValue="contained"
-        icon="google"
-        color="#2196f3"
-        labelStyle={styles.loginWithGoogle}
-        onPress={() => google()}
       />
       <FormButton
         title="New user? Join here"
@@ -77,9 +57,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
   },
   navButtonText: {
-    fontSize: 16,
-  },
-  loginWithGoogle: {
     fontSize: 16,
   },
 });

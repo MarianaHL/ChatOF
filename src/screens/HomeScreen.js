@@ -1,9 +1,8 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {View, StyleSheet, TouchableOpacity, FlatList, Text} from 'react-native';
-import {Avatar} from 'react-native-paper';
+import {Avatar, Divider} from 'react-native-paper';
 import {AuthContext} from '../navigation/AuthProvider';
 import database from '@react-native-firebase/database';
-import {Separator} from '../components/Separator';
 
 export default function HomeScreen({navigation}) {
   const {user, logout} = useContext(AuthContext);
@@ -42,13 +41,14 @@ export default function HomeScreen({navigation}) {
           <TouchableOpacity
             onPress={() => navigation.navigate('Chat', {keyExtractor: item})}>
             <View style={styles.avatar}>
-              <Avatar.Image size={40} source={{uri: item.foto}} />
+              {/* <Avatar.Image size={40} source={{uri: item.foto}} /> */}
+              <Avatar.Icon size={40} icon="account" />
               <View style={{flexDirection: 'column'}}>
                 <Text style={styles.nombre}>{item.email}</Text>
                 <Text style={styles.puesto}>{item.uid}</Text>
               </View>
             </View>
-            <Separator />
+            <Divider />
           </TouchableOpacity>
         )}
       />

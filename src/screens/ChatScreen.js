@@ -4,6 +4,7 @@ import {
   Bubble,
   Send,
   SystemMessage,
+  Avatar,
 } from 'react-native-gifted-chat';
 import database from '@react-native-firebase/database';
 import {AuthContext} from '../navigation/AuthProvider';
@@ -49,19 +50,17 @@ export default function ChatScreen({route, navigation}) {
       .orderByKey()
       .on('child_added', (snapshot) => {
         //console.log('User data: ', snapshot.val());
-
-        console.log(snapshot.val());
+        //console.log(snapshot.val());
         /*
         if(snapshot.key === channel){
           const messages = (prevState) => [...prevState, snapshot.val()];
           setMessages(messages);
           console.log("true");
         }*/
-
         const messages = (prevState) => [...prevState, snapshot.val()];
         setMessages(messages);
       });
-    return () => messagesListener();
+    // return () => messagesListener();
   }, [channel]);
 
   function renderBubble(props) {
@@ -71,8 +70,10 @@ export default function ChatScreen({route, navigation}) {
         {...props}
         wrapperStyle={{
           right: {
-            // Here is the color change
             backgroundColor: '#6646ee',
+          },
+          left: {
+            backgroundColor: '#e0e0e0',
           },
         }}
         textStyle={{
@@ -132,15 +133,34 @@ export default function ChatScreen({route, navigation}) {
     );
   }
 
+  const renderAvatar = (props) => (
+    <Avatar
+      {...props}
+      imageStyle={{
+        left: {borderWidth: 3, borderColor: 'blue'},
+        right: {},
+      }}
+    />
+  );
+
+  function mapUser(user) {
+    return {
+      _id: currentUser.uid,
+      name: currentUser.email,
+      avatar: currentUser.foto,
+    };
+  }
+
   return (
     <GiftedChat
       messages={messages}
       inverted={false}
       onSend={handleSend}
-      user={{_id: currentUser.uid}}
+      user={mapUser(user)}
       placeholder="Type your message here..."
-      alwaysShowSend
       showUserAvatar
+      //renderAvatar={renderAvatar}
+      alwaysShowSend
       scrollToBottom
       renderBubble={renderBubble}
       renderLoading={renderLoading}
