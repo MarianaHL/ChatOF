@@ -28,13 +28,9 @@ export default function ChatScreen({route, navigation}) {
         _id: Math.round(Math.random() * 1000000),
         text,
         createdAt: new Date().getTime(),
-        userSend: {
+        user: {
           _id: currentUser.uid,
           email: currentUser.email,
-        },
-        userReceived: {
-          _id: keyExtractor.uid,
-          email: keyExtractor.email,
         },
       })
       .then((res) => {
@@ -47,20 +43,12 @@ export default function ChatScreen({route, navigation}) {
     //2 Obtener en el canal de ambos users
     const messagesListener = database()
       .ref(`chat/${channel}`)
-      .orderByKey()
+      .orderByChild('createdAt')
       .on('child_added', (snapshot) => {
-        //console.log('User data: ', snapshot.val());
-        //console.log(snapshot.val());
-        /*
-        if(snapshot.key === channel){
-          const messages = (prevState) => [...prevState, snapshot.val()];
-          setMessages(messages);
-          console.log("true");
-        }*/
         const messages = (prevState) => [...prevState, snapshot.val()];
         setMessages(messages);
       });
-    // return () => messagesListener();
+    //return () => messagesListener();
   }, [channel]);
 
   function renderBubble(props) {
