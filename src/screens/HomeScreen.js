@@ -14,6 +14,16 @@ export default function HomeScreen({navigation}) {
 
   useEffect(() => {
     //console.log({user: user.email});
+    /*
+
+      1.- Listar usuarios online => 0
+      2.- Listar usuarios offline => .......
+
+    if user -> mensaje
+
+    if user leyo el mensaje
+
+    */
 
     database()
     .ref('usuarios')
@@ -27,21 +37,6 @@ export default function HomeScreen({navigation}) {
     //usuariosConectados();
   }, []);
 
-  /*async function usuariosConectados() {
-    try {
-      let usersOnline = await database().ref('usuarios').once('value');
-      usersOnline.forEach((element) => {
-        const val = element.val();
-        if (!(currentUser.uid === val.uid)) {
-          const valores = (prevState) => [...prevState, element.val()];
-          setValores(valores);
-        }
-      });      
-      console.log(valores);
-    } catch (error) {
-      console.log(error);
-    }
-  }*/
 
   return (
     <View>

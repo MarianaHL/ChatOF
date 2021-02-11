@@ -10,11 +10,8 @@ export default function SignupScreen({navigation}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const {register, loading} = useContext(AuthContext);
+  const {register} = useContext(AuthContext);
 
-  if (loading) {
-    return <Loading />;
-  }
 
   return (
     <View style={styles.container}>

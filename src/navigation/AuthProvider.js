@@ -19,7 +19,11 @@ export const AuthProvider = ({children}) => {
         setLoading,
         login: async (email, password) => {
           try {
-            await auth().signInWithEmailAndPassword(email, password);
+            let {user} = await auth().signInWithEmailAndPassword(email, password);
+            await database()
+                .ref('usuarios/' + user.uid)
+                .update({state: 1});
+            console.log('Usuario loggeado');
           } catch (e) {
             console.log(e);
           }
@@ -27,19 +31,13 @@ export const AuthProvider = ({children}) => {
         register: async (displayName, email, password) => {
           setLoading(true);
           try {
-            let {user} = auth()
-              .createUserWithEmailAndPassword(email, password)
-              .then((credential) => {
-                credential.user.updateProfile({displayName: displayName});
-              });
+            let {user} = await auth().createUserWithEmailAndPassword(email, password)
             //setUser(user)
             console.log(user);
             const usuario = {
-              uid: user.uid,
-              nombre: user.displayName,
+              nombre: displayName,
               email: user.email,
-              foto: user.photoURL,
-              nuevosmensajes: 0,
+              state: 1
             };
             await database()
               .ref('usuarios/' + user.uid)
