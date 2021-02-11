@@ -3,21 +3,31 @@ import {View, StyleSheet, TouchableOpacity, FlatList, Text} from 'react-native';
 import {Avatar, Divider} from 'react-native-paper';
 import {AuthContext} from '../navigation/AuthProvider';
 import database from '@react-native-firebase/database';
+import auth from '@react-native-firebase/auth';
 
 export default function HomeScreen({navigation}) {
-  const {user, logout} = useContext(AuthContext);
+  //const {user, logout} = useContext(AuthContext);
   const keyExtractor = (item, index) => index.toString();
-  const currentUser = user.toJSON();
-
+  //const currentUser = user.toJSON();
+  const user = auth().currentUser;
   const [valores, setValores] = useState([]);
 
   useEffect(() => {
-    console.log({user: user.email});
+    //console.log({user: user.email});
 
-    usuariosConectados();
+    database()
+    .ref('usuarios')
+    .on('child_added', snap => {
+      if (user.uid !== snap.key) {
+        console.log('user', snap.val())
+        setValores((prevState) => [...prevState, snap.val()]);
+      }
+    });
+
+    //usuariosConectados();
   }, []);
 
-  async function usuariosConectados() {
+  /*async function usuariosConectados() {
     try {
       let usersOnline = await database().ref('usuarios').once('value');
       usersOnline.forEach((element) => {
@@ -26,12 +36,13 @@ export default function HomeScreen({navigation}) {
           const valores = (prevState) => [...prevState, element.val()];
           setValores(valores);
         }
-      });
+      });      
       console.log(valores);
     } catch (error) {
       console.log(error);
     }
-  }
+  }*/
+
   return (
     <View>
       <FlatList
