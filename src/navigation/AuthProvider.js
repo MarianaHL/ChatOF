@@ -35,6 +35,7 @@ export const AuthProvider = ({children}) => {
             //setUser(user)
             console.log(user);
             const usuario = {
+              uid : user.uid,
               nombre: displayName,
               email: user.email,
               state: 1
@@ -50,6 +51,7 @@ export const AuthProvider = ({children}) => {
         },
         logout: async () => {
           try {
+            await database().ref('usuarios/' + user.uid).update({state: 0});
             await auth().signOut();
           } catch (e) {
             console.error(e);

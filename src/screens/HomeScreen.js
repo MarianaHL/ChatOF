@@ -1,25 +1,19 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {View, StyleSheet, TouchableOpacity, FlatList, Text} from 'react-native';
 import {Avatar, Divider} from 'react-native-paper';
-import {AuthContext} from '../navigation/AuthProvider';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 
 export default function HomeScreen({navigation}) {
-  //const {user, logout} = useContext(AuthContext);
   const keyExtractor = (item, index) => index.toString();
-  //const currentUser = user.toJSON();
   const user = auth().currentUser;
   const [valores, setValores] = useState([]);
 
   useEffect(() => {
-    //console.log({user: user.email});
     /*
-
+    if user -> mensaje
       1.- Listar usuarios online => 0
       2.- Listar usuarios offline => .......
-
-    if user -> mensaje
 
     if user leyo el mensaje
 
@@ -33,8 +27,6 @@ export default function HomeScreen({navigation}) {
         setValores((prevState) => [...prevState, snap.val()]);
       }
     });
-
-    //usuariosConectados();
   }, []);
 
 

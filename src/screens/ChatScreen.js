@@ -28,10 +28,14 @@ export default function ChatScreen({route, navigation}) {
         _id: Math.round(Math.random() * 1000000),
         text,
         createdAt: new Date().getTime(),
-        user: {
+        userSend: {
           _id: currentUser.uid,
-          email: currentUser.email,
+          email: currentUser.email
         },
+        userRecived: {
+          _id: keyExtractor.uid,
+          email: keyExtractor.email
+        }
       })
       .then((res) => {
         console.log('mensaje guardado');
