@@ -1,5 +1,12 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {View, StyleSheet, TouchableOpacity, FlatList, Text} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Text,
+  AppState,
+} from 'react-native';
 import {Avatar, Divider} from 'react-native-paper';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
@@ -8,6 +15,33 @@ export default function HomeScreen({navigation}) {
   const keyExtractor = (item, index) => index.toString();
   const user = auth().currentUser;
   const [valores, setValores] = useState([]);
+
+  const [appState, setAppState] = useState(AppState.currentState);
+
+  useEffect(() => {
+    AppState.addEventListener('change', handleAppStateChange);
+    return () => {
+      AppState.removeEventListener('change', handleAppStateChange);
+    };
+  }, []);
+
+  const handleAppStateChange = (nextAppState) => {
+    console.log('App State: ' + nextAppState);
+    database()
+      .ref('usuarios/' + user.uid)
+      .update({state: 1});
+    if (appState != nextAppState) {
+      if (appState.match(/inactive|background/) && nextAppState === 'active') {
+        console.log('App State: ' + 'App has come to the foreground!');
+        alert('App State: ' + 'App has come to the foreground!');
+      }
+      alert('App State: ' + nextAppState);
+      setAppState(nextAppState);
+      database()
+        .ref('usuarios/' + user.uid)
+        .update({state: 0});
+    }
+  };
 
   useEffect(() => {
     /*
@@ -40,7 +74,6 @@ export default function HomeScreen({navigation}) {
     });
   */
   }, []);
-
 
   return (
     <View>

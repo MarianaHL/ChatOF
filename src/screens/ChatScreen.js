@@ -9,12 +9,11 @@ import {
 import database from '@react-native-firebase/database';
 import {AuthContext} from '../navigation/AuthProvider';
 import {IconButton} from 'react-native-paper';
-import {StyleSheet, View, ActivityIndicator} from 'react-native';
-import auth from '@react-native-firebase/auth';
+import {StyleSheet, View, ActivityIndicator, Text} from 'react-native';
 
 export default function ChatScreen({route, navigation}) {
   const {keyExtractor} = route.params;
-  console.warn(keyExtractor.uid);
+  //console.warn(keyExtractor.uid);
   const {user} = useContext(AuthContext);
   const currentUser = user.toJSON();
 
@@ -30,11 +29,16 @@ export default function ChatScreen({route, navigation}) {
       .push({
         _id: Math.round(Math.random() * 1000000),
         text,
-        createdAt: tiempo,
+        createdAt: new Date().getTime(),
+        status: false,
         user: {
           _id: currentUser.uid,
-          email: currentUser.email
-        }
+          email: currentUser.email,
+        },
+        userRecived: {
+          _id: keyExtractor.uid,
+          email: keyExtractor.email,
+        },
       })
       .then((res) => {
         console.log('mensaje guardado');
@@ -69,8 +73,8 @@ export default function ChatScreen({route, navigation}) {
       .ref(`chat/${channel}`)
       .orderByChild('createdAt')
       .on('child_added', (snapshot) => {
-        const messages = (prevState) => [...prevState, snapshot.val()];
-        setMessages(messages);
+        //const messages = (prevState) => [...prevState, snapshot.val()];
+        setMessages((prevState) => [...prevState, snapshot.val()]);
       });
     //return () => messagesListener();
   }, [channel]);
@@ -163,6 +167,32 @@ export default function ChatScreen({route, navigation}) {
     };
   }
 
+  function renderTicks(messages) {
+    if (messages.user._id === currentUser.uid) {
+      if (messages.status === false) {
+        return (
+          <View style={styles.tickView}>
+            <Text style={styles.tick}>✓</Text>
+          </View>
+        );
+      } else {
+        return (
+          <View style={styles.tickView}>
+            <Text style={styles.tick}>✓✓</Text>
+          </View>
+        );
+      }
+    } else {
+      database()
+        .ref(`chat/${channel}`)
+        .orderByKey()
+        .on('child_added', (snap) => {
+          //console.log(snap.key + ' KEEEEEYS');
+          database().ref(`chat/${channel}/${snap.key}`).update({status: true});
+        });
+    }
+  }
+
   return (
     <GiftedChat
       messages={messages}
@@ -174,6 +204,7 @@ export default function ChatScreen({route, navigation}) {
       //renderAvatar={renderAvatar}
       alwaysShowSend
       scrollToBottom
+      renderTicks={renderTicks}
       renderBubble={renderBubble}
       renderLoading={renderLoading}
       renderSend={renderSend}
@@ -206,5 +237,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#fff',
     fontWeight: 'bold',
+  },
+  tick: {
+    fontSize: 10,
+    backgroundColor: 'transparent',
+    color: '#fff',
+  },
+  tickView: {
+    flexDirection: 'row',
+    marginRight: 10,
   },
 });
