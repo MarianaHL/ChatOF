@@ -10,6 +10,7 @@ import database from '@react-native-firebase/database';
 import {AuthContext} from '../navigation/AuthProvider';
 import {IconButton} from 'react-native-paper';
 import {StyleSheet, View, ActivityIndicator} from 'react-native';
+import auth from '@react-native-firebase/auth';
 
 export default function ChatScreen({route, navigation}) {
   const {keyExtractor} = route.params;
@@ -22,25 +23,44 @@ export default function ChatScreen({route, navigation}) {
 
   function handleSend(messages) {
     const text = messages[0].text;
+    const tiempo = new Date().getTime();
+    //A channel entry
     database()
       .ref(`chat/${channel}`)
       .push({
         _id: Math.round(Math.random() * 1000000),
         text,
-        createdAt: new Date().getTime(),
-        userSend: {
+        createdAt: tiempo,
+        user: {
           _id: currentUser.uid,
           email: currentUser.email
-        },
-        userRecived: {
-          _id: keyExtractor.uid,
-          email: keyExtractor.email
         }
       })
       .then((res) => {
         console.log('mensaje guardado');
       })
       .catch((e) => console.log(e));
+      //Update last message: Usuarios
+      //User A send, User B received
+      updateLastMessage(currentUser, keyExtractor, tiempo);
+
+      //copia de User received
+      updateLastMessage(keyExtractor, currentUser, tiempo);
+  }
+  async function updateLastMessage(a, b, t){
+    
+    try {
+      await database()
+              .ref(`usuarios/${a.uid}/contactos/${b.uid}`)
+              .set({
+                uid : b.uid,
+                email : b.email,
+                lm:t * -1
+              });
+    } catch (error) {
+      console.log(error)
+    }
+    
   }
 
   useEffect(() => {

@@ -19,6 +19,17 @@ export default function HomeScreen({navigation}) {
 
     */
 
+   //Rama Contactos de usuarios con ultimos mensajes
+   database()
+    .ref(`usuarios/${user.uid}/contactos/`).orderByChild('lm')
+    .on('child_changed', snap => {  
+      //console.log('Contactos ARRAY: ', snap.val())
+      console.log("CAMBIO, "+snap.val().email)
+      setValores((prevState) => [...prevState, snap.val()]);
+    });
+
+    //Rama usuarios conectados
+    /*
     database()
     .ref('usuarios')
     .on('child_added', snap => {
@@ -27,6 +38,7 @@ export default function HomeScreen({navigation}) {
         setValores((prevState) => [...prevState, snap.val()]);
       }
     });
+  */
   }, []);
 
 
