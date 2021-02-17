@@ -19,7 +19,6 @@ export default function ChatScreen({route, navigation}) {
 
   const [messages, setMessages] = useState([]);
   const [channel, setChannel] = useState();
-
   function handleSend(messages) {
     const text = messages[0].text;
     const tiempo = new Date().getTime();
@@ -76,7 +75,7 @@ export default function ChatScreen({route, navigation}) {
         //const messages = (prevState) => [...prevState, snapshot.val()];
         setMessages((prevState) => [...prevState, snapshot.val()]);
       });
-    //return () => messagesListener();
+    //return () => database().ref(`chat/${channel}`).off('child_added', messagesListener);
   }, [channel]);
 
   function renderBubble(props) {
@@ -168,6 +167,7 @@ export default function ChatScreen({route, navigation}) {
   }
 
   function renderTicks(messages) {
+    console.log("EStos son los mensajes :  ",messages.user._id)
     if (messages.user._id === currentUser.uid) {
       if (messages.status === false) {
         return (

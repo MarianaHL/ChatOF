@@ -15,6 +15,8 @@ export default function HomeScreen({navigation}) {
   const keyExtractor = (item, index) => index.toString();
   const user = auth().currentUser;
   const [valores, setValores] = useState([]);
+  const [contactos, setContactos] = useState([]);
+  const [online, setOnline] = useState([]);
 
   const [appState, setAppState] = useState(AppState.currentState);
 
@@ -29,42 +31,37 @@ export default function HomeScreen({navigation}) {
     console.log('App State: ' + nextAppState);
     database()
       .ref('usuarios/' + user.uid)
-      .update({state: 1});
-    if (appState != nextAppState) {
-      if (appState.match(/inactive|background/) && nextAppState === 'active') {
-        console.log('App State: ' + 'App has come to the foreground!');
-        alert('App State: ' + 'App has come to the foreground!');
-      }
+      .update({state: 0});
+      if (appState != nextAppState) {
+        if (appState.match(/inactive|background/) && nextAppState === 'active') {
+          console.log('App State: ' + 'App has come to the foreground!');
+          alert('App State: ' + 'App has come to the foreground!');
+        }
       alert('App State: ' + nextAppState);
       setAppState(nextAppState);
       database()
         .ref('usuarios/' + user.uid)
-        .update({state: 0});
-    }
+        .update({state: 1});
+      }
   };
 
   useEffect(() => {
-    /*
-    if user -> mensaje
-      1.- Listar usuarios online => 0
-      2.- Listar usuarios offline => .......
-
-    if user leyo el mensaje
-
-    */
-
    //Rama Contactos de usuarios con ultimos mensajes
-   database()
-    .ref(`usuarios/${user.uid}/contactos/`).orderByChild('lm')
-    .on('child_changed', snap => {  
-      //console.log('Contactos ARRAY: ', snap.val())
-      console.log("CAMBIO, "+snap.val().email)
-      setValores((prevState) => [...prevState, snap.val()]);
-    });
+   //listarContactos();
+    listarOnline();
+    /*
+    const chatContactos = database()
+      .ref(`usuarios/${user.uid}/contactos/`).orderByChild('lm')
+      .on('child_changed', snap => {  
+        //console.log('Contactos ARRAY: ', snap.val())
+        console.log("CAMBIO changed, "+snap.val().email)
+        setValores((prevState) => [...prevState, snap.val()]);
+    });*/
+
 
     //Rama usuarios conectados
     /*
-    database()
+    const usuariosOnline = database()
     .ref('usuarios')
     .on('child_added', snap => {
       if (user.uid !== snap.key) {
@@ -72,13 +69,60 @@ export default function HomeScreen({navigation}) {
         setValores((prevState) => [...prevState, snap.val()]);
       }
     });
-  */
+    */
+
+   
+    //return () => database().ref(`usuarios`).off('child_added', usuariosOnline);
+    //return () => database().ref(`usuarios/${user.uid}/contactos/`).off('child_added', chatAdded);
+    //return () => database().ref(`usuarios/${user.uid}/contactos/`).off('child_changed', chatContactos);
+    
   }, []);
+
+  async function listarContactos(){
+    try {
+      const chatAdded = await database()
+        .ref(`usuarios/${user.uid}/contactos/`).orderByChild('lm')
+        .on('child_added', snap => {
+          //console.log('Contactos ARRAY: ', snap.val())
+          console.log("CAMBIO added, ",snap.val().email)
+          //setValores((prevState) => [...prevState, snap.val()]);
+          setContactos((prevState) => [...prevState, snap.val()]);
+      });
+    } catch (error) {
+      console.log(error)
+    }
+    
+    //return () => database().ref(`usuarios/${user.uid}/contactos/`).off('child_added', chatAdded);
+  }
+
+  async function listarOnline(){
+    try {
+      const chatAdded = await database()
+        .ref(`usuarios`)
+        .on('child_added', snap => {  
+          if(snap.val().state == 1){
+            //console.log('Contactos ARRAY: ', snap.val())
+            console.log("User Online:, ",snap.val().email)
+            setOnline((prevState) => [...prevState, snap.val()]);
+          }else{
+            online.forEach(function (item, index) {
+              if (snap.val().uid === item.uid) {
+                  online.splice(index, 1);
+              }
+            });
+          }
+          
+      });
+    } catch (error) {
+      console.log(error)
+    }
+    
+  }
 
   return (
     <View>
       <FlatList
-        data={valores}
+        data={online}
         keyExtractor={keyExtractor}
         renderItem={({item}) => (
           <TouchableOpacity
