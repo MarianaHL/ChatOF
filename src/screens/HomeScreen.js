@@ -67,6 +67,76 @@ export default function HomeScreen({navigation}) {
       .ref(`usuarios/${user.uid}/contactos/`)
       .orderByChild('lm')
       .on('child_changed', (snap) => {
+
+        /* Esto es lo que estaban haciendo
+        {
+          obj1 : {algo, algo},
+          obj2 : {algo, algo},
+          obj3 : {algo, algo}
+        }
+
+        {
+          obj1 : {algo, algo},
+          obj2 : {algoMásGrande, algo2, otraCosa},
+          obj3 : {algo, algo}
+        }
+
+        Obj2
+
+        Así inicia Valores = [];
+        state = Valores = [obj2, obj2, obj2];
+        */
+
+
+        // [0,1,2,3] Así se ve un array
+        // {uno, dos, tres} así se ve un objeto
+
+
+        /* Más o menos es lo que tiene que hacer.
+        
+          Primero obtengo los último 10 mensajes o las últimas 10 interacciones (Usuarios)
+          .orderByChild().toLimitLast().on('child_added')
+          Valores = (resultadoDelQuery);
+
+          Valores = {
+            KeyDelSnap: {loQueTengaSuIbjeto(), Snap}
+          }
+
+          Segundo paso:
+
+          .on('child_changed')
+
+          Obtener el KeyDelSnap para "comparar"
+          En valores existe ya este KeySnap???
+
+          -> valore[keySnap] = snap.val(); <-
+
+          valores[uid1] = si existe entonces remplaza;
+          valores[uid2] = no existse entonces crea;
+
+          //escuchando desde que inicia lo que se se agregue y lo que cambie;
+          useEfect(() => {
+            1 Aquí va cuando agregue
+              setValores((prevState) => {
+              prevState[keySnap] = snap.val();
+
+              return prevState;
+            });
+
+
+
+            2 Aquí va cuando cambie
+            setValores((prevState) => {
+              prevState[keySnap] = snap.val();
+
+              return prevState;
+            });
+          }, []);   
+
+
+        */
+
+
         //console.log('Contactos ARRAY: ', snap.val())
         console.log('CAMBIO, ' + snap.val().email);
         setValores((prevState) => [...prevState, snap.val()]);
