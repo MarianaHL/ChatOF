@@ -80,6 +80,9 @@ export default function HomeScreen({navigation}) {
 
   async function listarContactos(){
     try {
+      ref(`usuarios/${user.uid}/contactos`).orderByValue('lm').LimitToLast(10)
+
+
       const chatAdded = await database()
         .ref(`usuarios/${user.uid}/contactos/`).orderByChild('lm')
         .on('child_added', snap => {
