@@ -93,7 +93,7 @@ export default function HomeScreen({navigation}) {
 
 
         /* Más o menos es lo que tiene que hacer.
-        
+
           Primero obtengo los último 10 mensajes o las últimas 10 interacciones (Usuarios)
           .orderByChild().toLimitLast().on('child_added')
           Valores = (resultadoDelQuery);
@@ -134,6 +134,25 @@ export default function HomeScreen({navigation}) {
           }, []);   
 
 
+        */
+
+
+        /*
+          setValores             ((prevState)           =>                  [...prevState, snap.val()]);
+          Función que actualiza    Estado anterior     Arrow function       Esto es lo que se retorna
+                                                                            []
+                                                                            heredar lo que tiene el state al array
+                                                                            pasando el nuevo valor
+                                                                            array.push(NuevoValor)
+
+          setValores((prevState) => {...prevState, snap.val()});
+          setValores((prevState) => {}); aquí hay una función, tengo que retornar algo.
+
+          setValores((prevState) => {
+            //{key: valor}//
+            return { ...prevState, [key]: snap.val() }
+            return { ...prevState, KeyEstático: snap.val() }
+          });
         */
 
 
