@@ -13,7 +13,6 @@ import {StyleSheet, View, ActivityIndicator, Text} from 'react-native';
 
 export default function ChatScreen({route, navigation}) {
   const {keyExtractor} = route.params;
-  //console.warn(keyExtractor.uid);
   const {user} = useContext(AuthContext);
   const currentUser = user.toJSON();
 
@@ -44,27 +43,25 @@ export default function ChatScreen({route, navigation}) {
         console.log('mensaje guardado');
       })
       .catch((e) => console.log(e));
-      //Update last message: Usuarios
-      //User A send, User B received
-      updateLastMessage(currentUser, keyExtractor, tiempo);
+    //Update last message: Usuarios
+    //User A send, User B received
+    updateLastMessage(currentUser, keyExtractor, tiempo);
 
-      //copia de User received
-      updateLastMessage(keyExtractor, currentUser, tiempo);
+    //copia de User received
+    updateLastMessage(keyExtractor, currentUser, tiempo);
   }
-  async function updateLastMessage(a, b, t){
-    
+  async function updateLastMessage(a, b, t) {
     try {
       await database()
-              .ref(`usuarios/${a.uid}/contactos/${b.uid}`)
-              .set({
-                uid : b.uid,
-                email : b.email,
-                lm:t * -1
-              });
+        .ref(`usuarios/${a.uid}/contactos/${b.uid}`)
+        .set({
+          uid: b.uid,
+          email: b.email,
+          lm: t * -1,
+        });
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-    
   }
 
   useEffect(() => {
@@ -72,11 +69,18 @@ export default function ChatScreen({route, navigation}) {
     const messagesListener = database()
       .ref(`chat/${channel}`)
       .orderByChild('createdAt')
+      .limitToLast(20)
       .on('child_added', (snapshot) => {
         //const messages = (prevState) => [...prevState, snapshot.val()];
         setMessages((prevState) => [...prevState, snapshot.val()]);
+        //console.log('snapshot', snapshot.val());
       });
-    //return () => messagesListener();
+
+    return () =>
+      database()
+        .ref(`chat/${channel}`)
+        .orderByChild('createdAt')
+        .off('child_added', messagesListener);
   }, [channel]);
 
   function renderBubble(props) {
@@ -168,6 +172,7 @@ export default function ChatScreen({route, navigation}) {
   }
 
   function renderTicks(messages) {
+    console.log('-------------------');
     if (messages.user._id === currentUser.uid) {
       if (messages.status === false) {
         return (
@@ -185,10 +190,23 @@ export default function ChatScreen({route, navigation}) {
     } else {
       database()
         .ref(`chat/${channel}`)
-        .orderByKey()
-        .on('child_added', (snap) => {
-          //console.log(snap.key + ' KEEEEEYS');
-          database().ref(`chat/${channel}/${snap.key}`).update({status: true});
+        .once('value')
+        .then((snapshot) => {
+          //console.log('*********', snapshot.val());
+          let messageFiltered = {};
+          for (const keyMessage in snapshot.val()) {
+            const message = snapshot.val()[keyMessage];
+            if (message._id === messages._id) {
+              messageFiltered = {
+                key: keyMessage,
+                message,
+              };
+            }
+          }
+          console.log('message filtered', messageFiltered);
+          database()
+            .ref(`chat/${channel}/${messageFiltered.key}`)
+            .update({status: true});
         });
     }
   }

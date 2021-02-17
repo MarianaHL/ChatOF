@@ -53,26 +53,40 @@ export default function HomeScreen({navigation}) {
 
     */
 
-   //Rama Contactos de usuarios con ultimos mensajes
-   database()
-    .ref(`usuarios/${user.uid}/contactos/`).orderByChild('lm')
-    .on('child_changed', snap => {  
-      //console.log('Contactos ARRAY: ', snap.val())
-      console.log("CAMBIO, "+snap.val().email)
-      setValores((prevState) => [...prevState, snap.val()]);
-    });
+    //Rama Contactos de usuarios con ultimos mensajes
+    database()
+      .ref(`usuarios/${user.uid}/contactos/`)
+      .orderByChild('lm')
+      .on('child_added', (snap) => {
+        //console.log('Contactos ARRAY: ', snap.val())
+        console.log('AGREGAR, ' + snap.val().email);
+        setValores((prevState) => [...prevState, snap.val()]);
+      });
+
+    const chatContactos = database()
+      .ref(`usuarios/${user.uid}/contactos/`)
+      .orderByChild('lm')
+      .on('child_changed', (snap) => {
+        //console.log('Contactos ARRAY: ', snap.val())
+        console.log('CAMBIO, ' + snap.val().email);
+        setValores((prevState) => [...prevState, snap.val()]);
+      });
+
+    return () =>
+      database()
+        .ref(`usuarios/${user.uid}/contactos/`)
+        .off('child_changed', chatContactos);
 
     //Rama usuarios conectados
-    /*
-    database()
-    .ref('usuarios')
-    .on('child_added', snap => {
-      if (user.uid !== snap.key) {
-        console.log('user', snap.val())
-        setValores((prevState) => [...prevState, snap.val()]);
-      }
-    });
-  */
+
+    // database()
+    //   .ref('usuarios')
+    //   .on('child_added', (snap) => {
+    //     if (user.uid !== snap.key) {
+    //       console.log('user', snap.val());
+    //       setValores((prevState) => [...prevState, snap.val()]);
+    //     }
+    //   });
   }, []);
 
   return (
