@@ -51,13 +51,11 @@ export default function ChatScreen({route, navigation}) {
   }
   async function updateLastMessage(a, b, t) {
     try {
-      await database()
-        .ref(`usuarios/${a.uid}/contactos/${b.uid}`)
-        .set({
-          uid: b.uid,
-          email: b.email,
-          lm: t * -1,
-        });
+      await database().ref(`usuarios/${a.uid}/contactos/${b.uid}`).set({
+        uid: b.uid,
+        email: b.email,
+        lm: t,
+      });
     } catch (error) {
       console.log(error);
     }
@@ -70,9 +68,15 @@ export default function ChatScreen({route, navigation}) {
       .orderByChild('createdAt')
       .limitToLast(20)
       .on('child_added', (snapshot) => {
-        //const messages = (prevState) => [...prevState, snapshot.val()];
         setMessages((prevState) => [...prevState, snapshot.val()]);
-        //console.log('snapshot', snapshot.val());
+      });
+
+    database()
+      .ref(`chat/${channel}`)
+      .orderByChild('createdAt')
+      .limitToLast(20)
+      .on('child_changed', (snapshot) => {
+        setMessages((postElement) => [...postElement, snapshot.val()]);
       });
     //return () => database().ref(`chat/${channel}`).off('child_added', messagesListener);
   }, [channel]);
@@ -103,12 +107,12 @@ export default function ChatScreen({route, navigation}) {
     //1 Comprobar si existe el canal en caso contrario crearlo
     if (currentUser.uid < keyExtractor.uid) {
       setChannel(currentUser.uid + keyExtractor.uid);
-      console.log(channel + ' CHAAANEEEEEEEEEEEEL');
+      console.log(channel + ' CHAAANEEEEEEEEEEEEL 1');
       console.log(currentUser.uid);
       console.log(keyExtractor.uid);
     } else {
       setChannel(keyExtractor.uid + currentUser.uid);
-      console.log(channel + ' CHAAANEEEEEEEEEEEEL');
+      console.log(channel + ' CHAAANEEEEEEEEEEEEL 2');
       console.log(currentUser.uid);
       console.log(keyExtractor.uid);
     }
@@ -197,7 +201,6 @@ export default function ChatScreen({route, navigation}) {
               };
             }
           }
-          console.log('message filtered', messageFiltered);
           database()
             .ref(`chat/${channel}/${messageFiltered.key}`)
             .update({status: true});
