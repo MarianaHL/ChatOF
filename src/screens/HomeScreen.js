@@ -14,7 +14,7 @@ import auth from '@react-native-firebase/auth';
 export default function HomeScreen({navigation}) {
   const keyExtractor = (item, index) => index.toString();
   const user = auth().currentUser;
-  const [valores, setValores] = useState([]);
+  const [valores, setValores] = useState({});
 
   const [appState, setAppState] = useState(AppState.currentState);
 
@@ -44,31 +44,27 @@ export default function HomeScreen({navigation}) {
   };
 
   useEffect(() => {
-    /*
-    if user -> mensaje
-      1.- Listar usuarios online => 0
-      2.- Listar usuarios offline => .......
-
-    if user leyo el mensaje
-
-    */
-
     //Rama Contactos de usuarios con ultimos mensajes
     database()
       .ref(`usuarios/${user.uid}/contactos/`)
       .orderByChild('lm')
+      .limitToLast(10)
       .on('child_added', (snap) => {
-        //console.log('Contactos ARRAY: ', snap.val())
-        console.log('AGREGAR, ' + snap.val().email);
-        setValores((prevState) => [...prevState, snap.val()]);
+        console.log('AGREGAR, ', snap);
+        setValores((prevState) => {
+          return {...prevState, [snap.key]: snap.val()};
+        });
       });
 
     const chatContactos = database()
       .ref(`usuarios/${user.uid}/contactos/`)
-      .orderByChild('lm')
       .on('child_changed', (snap) => {
-
-        /* Esto es lo que estaban haciendo
+        console.log('CAMBIO, ', snap);
+        setValores((prevState) => {
+          return {...prevState, [snap.key]: snap.val()};
+        });
+      });
+    /* Esto es lo que estaban haciendo
         {
           obj1 : {algo, algo},
           obj2 : {algo, algo},
@@ -86,20 +82,16 @@ export default function HomeScreen({navigation}) {
         Así inicia Valores = [];
         state = Valores = [obj2, obj2, obj2];
         */
-
-
-        // [0,1,2,3] Así se ve un array
-        // {uno, dos, tres} así se ve un objeto
-
-
-        /* Más o menos es lo que tiene que hacer.
+    // [0,1,2,3] Así se ve un array
+    // {uno, dos, tres} así se ve un objeto
+    /* Más o menos es lo que tiene que hacer.
 
           Primero obtengo los último 10 mensajes o las últimas 10 interacciones (Usuarios)
           .orderByChild().toLimitLast().on('child_added')
           Valores = (resultadoDelQuery);
 
           Valores = {
-            KeyDelSnap: {loQueTengaSuIbjeto(), Snap}
+            KeyDelSnap: {loQueTengaSuObjeto(), Snap}
           }
 
           Segundo paso:
@@ -135,9 +127,7 @@ export default function HomeScreen({navigation}) {
 
 
         */
-
-
-        /*
+    /*
           setValores             ((prevState)           =>                  [...prevState, snap.val()]);
           Función que actualiza    Estado anterior     Arrow function       Esto es lo que se retorna
                                                                             []
@@ -155,43 +145,39 @@ export default function HomeScreen({navigation}) {
           });
         */
 
-
-        //console.log('Contactos ARRAY: ', snap.val())
-        console.log('CAMBIO, ' + snap.val().email);
-        setValores((prevState) => [...prevState, snap.val()]);
-      });
-
-    return () =>
-      database()
-        .ref(`usuarios/${user.uid}/contactos/`)
-        .off('child_changed', chatContactos);
+    //console.log('Contactos ARRAY: ', snap.val())
+    // return () =>
+    //   database()
+    //     .ref(`usuarios/${user.uid}/contactos/`)
+    //     .off('child_changed', chatContactos);
 
     //Rama usuarios conectados
-
-    // database()
-    //   .ref('usuarios')
-    //   .on('child_added', (snap) => {
-    //     if (user.uid !== snap.key) {
-    //       console.log('user', snap.val());
-    //       setValores((prevState) => [...prevState, snap.val()]);
-    //     }
-    //   });
+    /* database()
+      .ref('usuarios')
+      .on('child_added', (snap) => {
+        if (user.uid !== snap.key) {
+          console.log('user', snap.val());
+          setValores((prevState) => [...prevState, snap.val()]);
+        }
+      }); */
   }, []);
 
   return (
     <View>
       <FlatList
-        data={valores}
+        data={Object.keys(valores)}
         keyExtractor={keyExtractor}
         renderItem={({item}) => (
           <TouchableOpacity
-            onPress={() => navigation.navigate('Chat', {keyExtractor: item})}>
+            onPress={() =>
+              navigation.navigate('Chat', {keyExtractor: valores[item]})
+            }>
             <View style={styles.avatar}>
               {/* <Avatar.Image size={40} source={{uri: item.foto}} /> */}
               <Avatar.Icon size={40} icon="account" />
               <View style={{flexDirection: 'column'}}>
-                <Text style={styles.nombre}>{item.email}</Text>
-                <Text style={styles.puesto}>{item.uid}</Text>
+                <Text style={styles.nombre}>{valores[item].email}</Text>
+                <Text style={styles.puesto}>{valores[item].uid}</Text>
               </View>
             </View>
             <Divider />
