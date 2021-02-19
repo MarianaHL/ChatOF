@@ -4,14 +4,18 @@ import {Title, IconButton} from 'react-native-paper';
 import {AuthContext} from '../navigation/AuthProvider';
 import FormInput from '../components/FormInput';
 import FormButton from '../components/FormButton';
+import Loading from '../components/Loading';
 
 export default function SignupScreen({navigation}) {
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const {register} = useContext(AuthContext);
+  const {register, loading} = useContext(AuthContext);
 
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <View style={styles.container}>

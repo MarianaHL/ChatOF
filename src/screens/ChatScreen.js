@@ -1,4 +1,9 @@
 import React, {useState, useContext, useEffect} from 'react';
+import database from '@react-native-firebase/database';
+import {AuthContext} from '../navigation/AuthProvider';
+import {IconButton} from 'react-native-paper';
+import {StyleSheet, View, ActivityIndicator, Text} from 'react-native';
+import Loading from '../components/Loading';
 import {
   GiftedChat,
   Bubble,
@@ -6,10 +11,6 @@ import {
   SystemMessage,
   Avatar,
 } from 'react-native-gifted-chat';
-import database from '@react-native-firebase/database';
-import {AuthContext} from '../navigation/AuthProvider';
-import {IconButton} from 'react-native-paper';
-import {StyleSheet, View, ActivityIndicator, Text} from 'react-native';
 
 export default function ChatScreen({route, navigation}) {
   const {keyExtractor} = route.params;
@@ -18,6 +19,8 @@ export default function ChatScreen({route, navigation}) {
 
   const [messages, setMessages] = useState([]);
   const [channel, setChannel] = useState();
+  const [loading, setLoading] = useState(true);
+
   function handleSend(messages) {
     const text = messages[0].text;
     const tiempo = new Date().getTime();
@@ -51,11 +54,13 @@ export default function ChatScreen({route, navigation}) {
   }
   async function updateLastMessage(a, b, t) {
     try {
-      await database().ref(`usuarios/${a.uid}/contactos/${b.uid}`).set({
-        uid: b.uid,
-        email: b.email,
-        lm: t,
-      });
+      await database()
+        .ref(`usuarios/${a.uid}/contactos/${b.uid}`)
+        .set({
+          uid: b.uid,
+          email: b.email,
+          lm: t * -1,
+        });
     } catch (error) {
       console.log(error);
     }
@@ -68,7 +73,9 @@ export default function ChatScreen({route, navigation}) {
       .orderByChild('createdAt')
       .limitToLast(20)
       .on('child_added', (snapshot) => {
+        console.log('********AGREGANDO************');
         setMessages((prevState) => [...prevState, snapshot.val()]);
+        setLoading(false);
       });
 
     database()
@@ -76,7 +83,8 @@ export default function ChatScreen({route, navigation}) {
       .orderByChild('createdAt')
       .limitToLast(20)
       .on('child_changed', (snapshot) => {
-        setMessages((postElement) => [...postElement, snapshot.val()]);
+        console.log('***************CAMBIANDO*************');
+        //setMessages((prevState) => [...prevState, snapshot.val()]);
       });
     //return () => database().ref(`chat/${channel}`).off('child_added', messagesListener);
   }, [channel]);
@@ -170,7 +178,7 @@ export default function ChatScreen({route, navigation}) {
   }
 
   function renderTicks(messages) {
-    console.log("EStos son los mensajes :  ",messages.user._id)
+    //console.log('EStos son los mensajes :  ', messages.user._id);
     if (messages.user._id === currentUser.uid) {
       if (messages.status === false) {
         return (

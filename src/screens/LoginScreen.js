@@ -4,11 +4,16 @@ import {View, StyleSheet, Button} from 'react-native';
 import {Title} from 'react-native-paper';
 import FormInput from '../components/FormInput';
 import FormButton from '../components/FormButton';
+import Loading from '../components/Loading';
 
 export default function Login({navigation}) {
-  const {login} = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const {login, loading} = useContext(AuthContext);
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <View style={styles.container}>

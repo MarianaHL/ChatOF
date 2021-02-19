@@ -1,4 +1,10 @@
 import React, {useContext, useEffect, useState} from 'react';
+import {Icon} from 'react-native-elements';
+import {Avatar, Divider} from 'react-native-paper';
+import database from '@react-native-firebase/database';
+import auth from '@react-native-firebase/auth';
+import {useIsFocused} from '@react-navigation/native';
+import Loading from '../components/Loading';
 import {
   View,
   StyleSheet,
@@ -7,16 +13,16 @@ import {
   Text,
   AppState,
 } from 'react-native';
-import {Avatar, Divider} from 'react-native-paper';
-import database from '@react-native-firebase/database';
-import auth from '@react-native-firebase/auth';
 
 export default function HomeScreen({navigation}) {
   const keyExtractor = (item, index) => index.toString();
   const user = auth().currentUser;
+  const [loading, setLoading] = useState(true);
   const [valores, setValores] = useState({});
   const [contactos, setContactos] = useState([]);
-  const [online, setOnline] = useState([]);
+  const [online, setOnline] = useState({});
+
+  const isFocused = useIsFocused();
 
   const [appState, setAppState] = useState(AppState.currentState);
 
@@ -31,21 +37,22 @@ export default function HomeScreen({navigation}) {
     console.log('App State: ' + nextAppState);
     database()
       .ref('usuarios/' + user.uid)
-      .update({state: 0});
-      if (appState != nextAppState) {
-        if (appState.match(/inactive|background/) && nextAppState === 'active') {
-          console.log('App State: ' + 'App has come to the foreground!');
-          alert('App State: ' + 'App has come to the foreground!');
-        }
+      .update({state: 1});
+    if (appState != nextAppState) {
+      if (appState.match(/inactive|background/) && nextAppState === 'active') {
+        console.log('App State: ' + 'App has come to the foreground!');
+        alert('App State: ' + 'App has come to the foreground!');
+      }
       alert('App State: ' + nextAppState);
       setAppState(nextAppState);
       database()
         .ref('usuarios/' + user.uid)
-        .update({state: 1});
-      }
+        .update({state: 0});
+    }
   };
 
   useEffect(() => {
+    let isCancelled = false;
     //Rama Contactos de usuarios con ultimos mensajes
     database()
       .ref(`usuarios/${user.uid}/contactos/`)
@@ -53,159 +60,82 @@ export default function HomeScreen({navigation}) {
       .limitToLast(10)
       .on('child_added', (snap) => {
         console.log('AGREGAR, ', snap);
-        setValores((prevState) => {
-          return {...prevState, [snap.key]: snap.val()};
-        });
+        if (!isCancelled) {
+          setValores((prevState) => {
+            return {...prevState, [snap.key]: snap.val()};
+          });
+
+          if (loading) {
+            setLoading(false);
+          }
+        }
       });
 
     const chatContactos = database()
       .ref(`usuarios/${user.uid}/contactos/`)
+      .orderByChild('lm')
       .on('child_changed', (snap) => {
         console.log('CAMBIO, ', snap);
-        setValores((prevState) => {
-          return {...prevState, [snap.key]: snap.val()};
-        });
-      });
-    /* Esto es lo que estaban haciendo
-        {
-          obj1 : {algo, algo},
-          obj2 : {algo, algo},
-          obj3 : {algo, algo}
-        }
-
-        {
-          obj1 : {algo, algo},
-          obj2 : {algoMásGrande, algo2, otraCosa},
-          obj3 : {algo, algo}
-        }
-
-        Obj2
-
-        Así inicia Valores = [];
-        state = Valores = [obj2, obj2, obj2];
-        */
-    // [0,1,2,3] Así se ve un array
-    // {uno, dos, tres} así se ve un objeto
-    /* Más o menos es lo que tiene que hacer.
-
-          Primero obtengo los último 10 mensajes o las últimas 10 interacciones (Usuarios)
-          .orderByChild().toLimitLast().on('child_added')
-          Valores = (resultadoDelQuery);
-
-          Valores = {
-            KeyDelSnap: {loQueTengaSuObjeto(), Snap}
-          }
-
-          Segundo paso:
-
-          .on('child_changed')
-
-          Obtener el KeyDelSnap para "comparar"
-          En valores existe ya este KeySnap???
-
-          -> valore[keySnap] = snap.val(); <-
-
-          valores[uid1] = si existe entonces remplaza;
-          valores[uid2] = no existse entonces crea;
-
-          //escuchando desde que inicia lo que se se agregue y lo que cambie;
-          useEfect(() => {
-            1 Aquí va cuando agregue
-              setValores((prevState) => {
-              prevState[keySnap] = snap.val();
-
-              return prevState;
-            });
-
-
-
-            2 Aquí va cuando cambie
-            setValores((prevState) => {
-              prevState[keySnap] = snap.val();
-
-              return prevState;
-            });
-          }, []);   
-
-
-        */
-    /*
-          setValores             ((prevState)           =>                  [...prevState, snap.val()]);
-          Función que actualiza    Estado anterior     Arrow function       Esto es lo que se retorna
-                                                                            []
-                                                                            heredar lo que tiene el state al array
-                                                                            pasando el nuevo valor
-                                                                            array.push(NuevoValor)
-
-          setValores((prevState) => {...prevState, snap.val()});
-          setValores((prevState) => {}); aquí hay una función, tengo que retornar algo.
-
+        if (!isCancelled) {
           setValores((prevState) => {
-            //{key: valor}//
-            return { ...prevState, [key]: snap.val() }
-            return { ...prevState, KeyEstático: snap.val() }
+            return {...prevState, [snap.key]: snap.val()};
           });
-        */
 
-    //console.log('Contactos ARRAY: ', snap.val())
-    // return () =>
-    //   database()
-    //     .ref(`usuarios/${user.uid}/contactos/`)
-    //     .off('child_changed', chatContactos);
-
-    //Rama usuarios conectados
-    /* database()
-      .ref('usuarios')
-      .on('child_added', (snap) => {
-        if (user.uid !== snap.key) {
-          console.log('user', snap.val());
-          setValores((prevState) => [...prevState, snap.val()]);
+          if (loading) {
+            setLoading(false);
+          }
         }
-      }); */
-  }, []);
+      });
 
-  async function listarContactos(){
+    listarOnline();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [isFocused, loading]);
+
+  async function listarContactos() {
     try {
-      ref(`usuarios/${user.uid}/contactos`).orderByValue('lm').LimitToLast(10)
-
-
       const chatAdded = await database()
-        .ref(`usuarios/${user.uid}/contactos/`).orderByChild('lm')
-        .on('child_added', snap => {
+        .ref(`usuarios/${user.uid}/contactos/`)
+        .orderByChild('lm')
+        .limitToLast(10)
+        .on('child_added', (snap) => {
           //console.log('Contactos ARRAY: ', snap.val())
-          console.log("CAMBIO added, ",snap.val().email)
+          console.log('CAMBIO added, ', snap.val().email);
           //setValores((prevState) => [...prevState, snap.val()]);
           setContactos((prevState) => [...prevState, snap.val()]);
-      });
+        });
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-    
+
     //return () => database().ref(`usuarios/${user.uid}/contactos/`).off('child_added', chatAdded);
   }
 
-  async function listarOnline(){
+  async function listarOnline() {
     try {
       const chatAdded = await database()
         .ref(`usuarios`)
-        .on('child_added', snap => {  
-          if(snap.val().state == 1){
-            //console.log('Contactos ARRAY: ', snap.val())
-            console.log("User Online:, ",snap.val().email)
-            setOnline((prevState) => [...prevState, snap.val()]);
-          }else{
-            online.forEach(function (item, index) {
-              if (snap.val().uid === item.uid) {
-                  online.splice(index, 1);
-              }
-            });
+        .orderByChild('lm')
+        .limitToLast(10)
+        .on('child_added', (snap) => {
+          if (snap.val().state == 1) {
+            console.log('User Online:, ', snap.val().email);
+            if (user.uid !== snap.key) {
+              setOnline((prevState) => {
+                return {...prevState, [snap.key]: snap.val()};
+              });
+            }
           }
-          //background 
-      });
+        });
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-    
+  }
+
+  if (loading) {
+    return <Loading />;
   }
 
   return (
@@ -230,6 +160,30 @@ export default function HomeScreen({navigation}) {
           </TouchableOpacity>
         )}
       />
+      <View style={styles.contenedorTexto}>
+        <Text style={styles.texto}>En línea</Text>
+        <Icon name="circle" color="#00e676" />
+      </View>
+      <FlatList
+        data={Object.keys(online)}
+        keyExtractor={keyExtractor}
+        renderItem={({item}) => (
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('Chat', {keyExtractor: online[item]})
+            }>
+            <View style={styles.avatar}>
+              {/* <Avatar.Image size={40} source={{uri: item.foto}} /> */}
+              <Avatar.Icon size={40} icon="account" />
+              <View style={{flexDirection: 'column'}}>
+                <Text style={styles.nombre}>{online[item].email}</Text>
+                <Text style={styles.puesto}>{online[item].uid}</Text>
+              </View>
+            </View>
+            <Divider />
+          </TouchableOpacity>
+        )}
+      />
     </View>
   );
 }
@@ -248,5 +202,13 @@ const styles = StyleSheet.create({
   puesto: {
     paddingLeft: 10,
     color: 'grey',
+  },
+  texto: {
+    fontSize: 20,
+  },
+  contenedorTexto: {
+    margin: 10,
+    marginTop: 30,
+    flexDirection: 'row',
   },
 });

@@ -18,11 +18,15 @@ export const AuthProvider = ({children}) => {
         loading,
         setLoading,
         login: async (email, password) => {
+          setLoading(true);
           try {
-            let {user} = await auth().signInWithEmailAndPassword(email, password);
+            let {user} = await auth().signInWithEmailAndPassword(
+              email,
+              password,
+            );
             await database()
-                .ref('usuarios/' + user.uid)
-                .update({state: 1});
+              .ref('usuarios/' + user.uid)
+              .update({state: 1});
             console.log('Usuario loggeado');
           } catch (e) {
             console.log(e);
@@ -31,14 +35,17 @@ export const AuthProvider = ({children}) => {
         register: async (displayName, email, password) => {
           setLoading(true);
           try {
-            let {user} = await auth().createUserWithEmailAndPassword(email, password)
+            let {user} = await auth().createUserWithEmailAndPassword(
+              email,
+              password,
+            );
             //setUser(user)
             console.log(user);
             const usuario = {
-              uid : user.uid,
+              uid: user.uid,
               nombre: displayName,
               email: user.email,
-              state: 1
+              state: 1,
             };
             await database()
               .ref('usuarios/' + user.uid)
@@ -51,7 +58,9 @@ export const AuthProvider = ({children}) => {
         },
         logout: async () => {
           try {
-            await database().ref('usuarios/' + user.uid).update({state: 0});
+            await database()
+              .ref('usuarios/' + user.uid)
+              .update({state: 0});
             await auth().signOut();
           } catch (e) {
             console.error(e);
